@@ -1,0 +1,16 @@
+<h1>Search Units</h1>
+
+<form method="GET">
+    <input type="text" name="q" placeholder="Search unit">
+    <button type="submit">Search</button>
+</form>
+
+<hr>
+
+{% for unit in results %}
+    <p>
+    <a href="/units/{{ unit.id }}/">{{ unit.unit_name }}</a><br> 
+    </p>
+{% empty %}
+    <p>No units found.</p>
+{% endfor %}

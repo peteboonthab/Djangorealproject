@@ -1,0 +1,36 @@
+<form method="post" action="{% url 'assignment' %}">
+{% csrf_token %}
+
+<table>
+<tr>
+  <th>Name</th>
+  <th>Score</th>
+  <th>Action</th>
+</tr>
+
+{% if not form.instance.id %}
+<tr>
+  {% include 'something/save.html' %}
+</tr>
+{% endif %}
+
+{% for assignment in assignments %}
+<tr>
+
+{% if form.instance.id == assignment.id %}
+  {% include 'something/save.html' %}
+{% else %}
+  <td>{{ assignment.assignment_name }}</td>
+  <td>{{ assignment.assignment_weight }}</td>
+  <td>
+    <button name="edit" value="{{ assignment.id }}" formnovalidate>Edit</button>
+    <button name="delete" value="{{ assignment.id }}" formnovalidate>Delete</button>
+  </td>
+{% endif %}
+
+</tr>
+{% endfor %}
+
+</table>
+
+</form>

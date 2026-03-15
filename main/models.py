@@ -8,5 +8,8 @@ class Unit(models.Model):
     def __str__(self):
         return self.unit_name
 
+class Assignment(models.Model):
+    assignment_name = models.CharField(max_length = 20)
+    assignment_weight = models.IntegerField() # stored number in database
 
 # Create your models here.

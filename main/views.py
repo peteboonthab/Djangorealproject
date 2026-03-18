@@ -21,9 +21,7 @@ def search_unit(request):
             results = Unit.objects.all()
 
     context = {
-        'results': results,  #create a dictionary named context that send data from view to html
-
-        
+        'results': results,  #create a dictionary named context that send data from view to html 
         }
     return render(request, "something/searchunit.html", context)
 

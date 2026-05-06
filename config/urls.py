@@ -24,6 +24,10 @@ urlpatterns = [
 
     re_path(r'^home$', views.index, name='home'),
     re_path(r'^search$', views.search_unit, name='search'),
-    path('units/<int:unit_id>/', views.details, name='details'),
-    re_path(r'^assignment$', views.creation, name = 'assignment')
+
+    path('units/<int:unit_id>/', views.unit_detail, name='unit_detail'),
+
+
+    path('units/<int:unit_id>/set/<int:set_id>/', views.details, name='details'),
+
 ]

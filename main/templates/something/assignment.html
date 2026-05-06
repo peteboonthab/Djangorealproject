@@ -1,36 +1,23 @@
-<form method="post" action="{% url 'assignment' %}">
-{% csrf_token %}
+<form method="post">
+    {% csrf_token %}
 
-<table>
-<tr>
-  <th>Name</th>
-  <th>Score</th>
-  <th>Action</th>
-</tr>
+    {{ formset.management_form }}
 
-{% if not form.instance.id %}
-<tr>
-  {% include 'something/save.html' %}
-</tr>
-{% endif %}
 
-{% for assignment in assignments %}
-<tr>
+    <table>
+        <tr>
+            <th>Assignment Name</th>
+            <th>Assignment Weight</th>
+        </tr>
 
-{% if form.instance.id == assignment.id %}
-  {% include 'something/save.html' %}
-{% else %}
-  <td>{{ assignment.assignment_name }}</td>
-  <td>{{ assignment.assignment_weight }}</td>
-  <td>
-    <button name="edit" value="{{ assignment.id }}" formnovalidate>Edit</button>
-    <button name="delete" value="{{ assignment.id }}" formnovalidate>Delete</button>
-  </td>
-{% endif %}
+        {% for form in formset %}
+        <tr>
+            <td>{{ form.assignment_name }}</td>
+            <td>{{ form.assignment_weight }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 
-</tr>
-{% endfor %}
-
-</table>
-
+    <button type="submit">Save All</button>
+    {{ formset.non_form_errors }}
 </form>

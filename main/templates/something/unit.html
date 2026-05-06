@@ -1,4 +1,4 @@
-<h1>{{ unit.unit_name }}</h1>
+﻿<h1>{{ unit.unit_name }}</h1>
 
 <h2>Achievement</h2>
 <p>{{ unit.unit_goal }}</p>
@@ -9,6 +9,13 @@
 
 
 <hr>
+<h2>Set Title</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ set_form.as_p }}
+    <button type="submit">Update Title</button>
+</form>
 
 <h2>Assignments</h2>
 <form method="post">
@@ -27,6 +34,7 @@
         <tr>
             <td>{{ form.assignment_name }}</td>
             <td>{{ form.assignment_weight }}</td>
+                    <td>{{ form.DELETE }}</td>
         </tr>
         {% endfor %}
     </table>

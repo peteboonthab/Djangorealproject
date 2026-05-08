@@ -36,10 +36,10 @@ def unit_detail(request, unit_id):
             title="Default Set"
         )
 
-    # ✔ title form
+    #  title form
     set_form = AssignmentSetForm(request.POST or None, instance=assignment_set)
 
-    # ✔ assignment formset
+    #  assignment formset
     formset = AssignmentFormSet(
         request.POST or None,
         queryset=assignment_set.assignments.all()

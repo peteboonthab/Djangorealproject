@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Q # search multiple field at once
 from .forms import AssignmentForm, BaseAssignmentFormSet, AssignmentSetForm, AssignmentFormSet
 from .models import Assignment, Unit, AssignmentSet
+from django.shortcuts import render, get_object_or_404  
 
 def index(request):
     units = Unit.objects.all()
@@ -26,46 +27,42 @@ def search_unit(request):
         }
     return render(request, "something/searchunit.html", context)
 def unit_detail(request, unit_id):
+
     unit = Unit.objects.get(id=unit_id)
 
-    assignment_set = unit.assignment_set.first()
+    # blank forms initially
+    set_form = AssignmentSetForm(request.POST or None)
 
-    if not assignment_set:
-        assignment_set = AssignmentSet.objects.create(
-            unit=unit,
-            title="Default Set"
-        )
-
-    # ✔ title form
-    set_form = AssignmentSetForm(request.POST or None, instance=assignment_set)
-
-    # ✔ assignment formset
     formset = AssignmentFormSet(
         request.POST or None,
-        queryset=assignment_set.assignments.all()
+        queryset=Assignment.objects.none()
     )
 
     if request.method == "POST":
 
-        # save title
-        if set_form.is_valid():
-            set_form.save()
+        if set_form.is_valid() and formset.is_valid():
 
-        # save assignments (NO delete logic)
-        if formset.is_valid():
+            # create AssignmentSet ONLY after save
+            assignment_set = set_form.save(commit=False)
+            assignment_set.unit = unit
+            assignment_set.save()
+
+            # save assignments
             instances = formset.save(commit=False)
 
             for obj in instances:
                 obj.assignment_set = assignment_set
                 obj.save()
 
-        return redirect('unit_detail', unit_id=unit.id)
+            return redirect(
+                'outline_detail',
+                set_id=assignment_set.id
+            )
 
-    return render(request, "something/unit.html", {
-        "unit": unit,
-        "assignment_set": assignment_set,
-        "formset": formset,
-        "set_form": set_form
+    return render(request, 'something/unit.html', {
+        'unit': unit,
+        'set_form': set_form,
+        'formset': formset,
     })
 def details(request, unit_id, set_id):
     unit = Unit.objects.get(id=unit_id)
@@ -90,6 +87,45 @@ def details(request, unit_id, set_id):
         'unit': unit,
         'assignment_set': assignment_set,
         'formset': formset
+    })
+
+
+
+
+def unitlist(request, set_id):
+
+    assignment_set = get_object_or_404(AssignmentSet, id=set_id)
+    unit = assignment_set.unit
+
+    set_form = AssignmentSetForm(
+        request.POST or None,
+        instance=assignment_set
+    )
+
+    formset = AssignmentFormSet(
+        request.POST or None,
+        queryset=assignment_set.assignments.all()
+    )
+
+    if request.method == "POST":
+
+        if set_form.is_valid() and formset.is_valid():
+
+            set_form.save()
+
+            instances = formset.save(commit=False)
+
+            for obj in instances:
+                obj.assignment_set = assignment_set
+                obj.save()
+
+            return redirect('outline_detail', set_id=assignment_set.id)
+
+    return render(request, 'something/unitlist.html', {
+        'unit': unit,
+        'assignment_set': assignment_set,
+        'set_form': set_form,
+        'formset': formset,
     })
 # Create your views here.
 

@@ -1,20 +1,16 @@
 ﻿<h1>{{ unit.unit_name }}</h1>
 
-<h2>Achievement</h2>
-<p>{{ unit.unit_goal }}</p>
-
-<h2>Description</h2>
-<p>{{ unit.unit_description }}</p>
+<h2>Outline Title</h2>
+<p>{{ assignment_set.title }}</p>
 
 <hr>
+
+<h2>Assignments</h2>
 
 <form method="post">
     {% csrf_token %}
 
-    <h2>Set Title</h2>
     {{ set_form.as_p }}
-
-    <h2>Assignments</h2>
 
     {{ formset.management_form }}
 
@@ -34,6 +30,9 @@
 
     {{ formset.non_form_errors }}
 
-    <button type="submit">Save Outline</button>
-
+    <button type="submit">Update Outline</button>
 </form>
+
+<hr>
+
+<a href="{% url 'unit_detail' unit.id %}">← Back to Unit</a>

@@ -27,7 +27,10 @@ urlpatterns = [
 
     path('units/<int:unit_id>/', views.unit_detail, name='unit_detail'),
 
-
-    path('units/<int:unit_id>/set/<int:set_id>/', views.details, name='details'),
+    path(
+        'outline/<int:set_id>/',
+        views.unitlist,
+        name='unitlist'
+    ),
 
 ]

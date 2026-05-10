@@ -33,6 +33,18 @@ def unit_detail(request, unit_id):
     # blank forms initially
     set_form = AssignmentSetForm(request.POST or None)
 
+
+    if not assignment_set:
+        assignment_set = AssignmentSet.objects.create(
+            unit=unit,
+            title="Default Set"
+        )
+
+    #  title form
+    set_form = AssignmentSetForm(request.POST or None, instance=assignment_set)
+
+    #  assignment formset
+
     formset = AssignmentFormSet(
         request.POST or None,
         queryset=Assignment.objects.none()

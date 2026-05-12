@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.db.models import Q # search multiple field at once
-from .forms import AssignmentForm, BaseAssignmentFormSet, AssignmentSetForm, AssignmentFormSet
-from .models import Assignment, Unit, AssignmentSet
+from .forms import AssignmentForm, BaseAssignmentFormSet, AssignmentSetForm, AssignmentFormSet, UploadForm
+from .models import Assignment, Unit, AssignmentSet, Upload
 from django.shortcuts import render, get_object_or_404  
 
 def index(request):
@@ -30,21 +30,10 @@ def unit_detail(request, unit_id):
 
     unit = Unit.objects.get(id=unit_id)
 
-    # blank forms initially
+    # title form
     set_form = AssignmentSetForm(request.POST or None)
 
-
-    if not assignment_set:
-        assignment_set = AssignmentSet.objects.create(
-            unit=unit,
-            title="Default Set"
-        )
-
-    #  title form
-    set_form = AssignmentSetForm(request.POST or None, instance=assignment_set)
-
-    #  assignment formset
-
+    # assignment formset
     formset = AssignmentFormSet(
         request.POST or None,
         queryset=Assignment.objects.none()
@@ -54,7 +43,7 @@ def unit_detail(request, unit_id):
 
         if set_form.is_valid() and formset.is_valid():
 
-            # create AssignmentSet ONLY after save
+            # create AssignmentSet after submit
             assignment_set = set_form.save(commit=False)
             assignment_set.unit = unit
             assignment_set.save()
@@ -67,7 +56,7 @@ def unit_detail(request, unit_id):
                 obj.save()
 
             return redirect(
-                'outline_detail',
+                'unitlist',
                 set_id=assignment_set.id
             )
 
@@ -138,6 +127,20 @@ def unitlist(request, set_id):
         'assignment_set': assignment_set,
         'set_form': set_form,
         'formset': formset,
+    })
+
+def upload_file(request):
+    form = UploadForm(request.POST or None, request.FILES or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect('file_page')
+
+    files = Upload.objects.all()
+
+    return render(request, 'something/upload_file.html', {
+        'form': form,
+        'files': files
     })
 # Create your views here.
 

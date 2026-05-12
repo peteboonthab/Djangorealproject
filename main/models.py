@@ -18,5 +18,8 @@ class Assignment(models.Model):
 
     def __str__(self):
         return self.assignment_name
+class Upload(models.Model):
+    title = models.CharField(max_length=50)
+    file = models.FileField(upload_to="resources/")
 
 # Create your models here.

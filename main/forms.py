@@ -1,4 +1,4 @@
-from .models import Assignment, AssignmentSet
+from .models import Assignment, AssignmentSet, Upload
 from django import forms 
 from django.forms import BaseModelFormSet, modelformset_factory
 
@@ -11,6 +11,11 @@ class AssignmentSetForm(forms.ModelForm):
     class Meta:
         model = AssignmentSet
         fields = ['title']
+
+class UploadForm(forms.ModelForm):
+    class Meta:
+        model = Upload
+        fields = ["title", "file"]
 
 class BaseAssignmentFormSet(BaseModelFormSet):
 
@@ -32,6 +37,8 @@ AssignmentFormSet = modelformset_factory(
     formset=BaseAssignmentFormSet,
     max_num=4,
     extra=4
+
+
 
 
 

@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import RegexValidator
 
 class Unit(models.Model):
     unit_name = models.CharField(max_length = 50)
@@ -21,5 +22,24 @@ class Assignment(models.Model):
 class Upload(models.Model):
     title = models.CharField(max_length=50)
     file = models.FileField(upload_to="resources/")
+
+class Signin(models.Model):
+    role_choices = ['student','student'
+                    'teacher','teacher']
+    user = models.CharField(max_length=20, unique=True)
+    password = models.CharField(
+        max_length=50,
+        validators=[
+            RegexValidator(
+                regex=r'^(?=.*@).{10,20}$',
+                message="Enter a valid registration number in the format ABCDEFG123@",
+                code="invalid_registration",
+            ),
+        ],
+    )
+    role = models.CharField(max_length=10, default = 'student')
+
+    def __str__(self):
+        return self.user
 
 # Create your models here.

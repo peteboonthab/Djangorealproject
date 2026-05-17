@@ -1,6 +1,7 @@
-from .models import Assignment, AssignmentSet, Upload
+from .models import Assignment, AssignmentSet, Upload, Signin
 from django import forms 
 from django.forms import BaseModelFormSet, modelformset_factory
+
 
 class AssignmentForm(forms.ModelForm): #ModelForm read model and create field automtcailly 
     class Meta:
@@ -16,6 +17,11 @@ class UploadForm(forms.ModelForm):
     class Meta:
         model = Upload
         fields = ["title", "file"]
+
+class SigninForm(forms.ModelForm):
+    class Meta:
+        model = Signin
+        fields = ['user','password']
 
 class BaseAssignmentFormSet(BaseModelFormSet):
 

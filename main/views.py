@@ -1,8 +1,48 @@
 from django.shortcuts import render, redirect
 from django.db.models import Q # search multiple field at once
-from .forms import AssignmentForm, BaseAssignmentFormSet, AssignmentSetForm, AssignmentFormSet, UploadForm
-from .models import Assignment, Unit, AssignmentSet, Upload
-from django.shortcuts import render, get_object_or_404  
+from .forms import AssignmentForm, BaseAssignmentFormSet, AssignmentSetForm, AssignmentFormSet, UploadForm, SigninForm
+from .models import Assignment, Unit, AssignmentSet, Upload, Signin
+from django.shortcuts import render, get_object_or_404 
+from functools import wraps
+
+
+def teacher_required(view_func):
+
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+
+        if 'user' not in request.session:
+            return redirect('login')
+
+        current_user = Signin.objects.get(
+            user=request.session['user']
+        )
+
+        if current_user.role != 'teacher':
+            return redirect('login')
+
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
+
+def student_required(view_func):
+
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+
+        if 'user' not in request.session:
+            return redirect('login')
+
+        current_user = Signin.objects.get(
+            user=request.session['user']
+        )
+
+        if current_user.role != 'student':
+            return redirect('login')
+
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
 
 def index(request):
     units = Unit.objects.all()
@@ -26,6 +66,8 @@ def search_unit(request):
         
         }
     return render(request, "something/searchunit.html", context)
+
+@teacher_required
 def unit_detail(request, unit_id):
 
     unit = Unit.objects.get(id=unit_id)
@@ -65,6 +107,7 @@ def unit_detail(request, unit_id):
         'set_form': set_form,
         'formset': formset,
     })
+@teacher_required
 def details(request, unit_id, set_id):
     unit = Unit.objects.get(id=unit_id)
     assignment_set = AssignmentSet.objects.get(id=set_id, unit=unit)
@@ -129,7 +172,9 @@ def unitlist(request, set_id):
         'formset': formset,
     })
 
+@teacher_required
 def upload_file(request):
+
     form = UploadForm(request.POST or None, request.FILES or None)
 
     if request.method == "POST" and form.is_valid():
@@ -142,6 +187,75 @@ def upload_file(request):
         'form': form,
         'files': files
     })
+
+def account(request):
+
+    if request.method == 'POST':
+
+        form = SigninForm(request.POST)
+
+        if form.is_valid():
+
+            form.save()
+
+            request.session['user'] = form.cleaned_data['user']
+
+            return redirect('file_page')
+
+    else:
+        form = SigninForm()
+
+    return render(
+        request,
+        'something/signin.html',
+        {'form': form}
+    )
 # Create your views here.
+
+def login_view(request):
+
+    error = ""
+
+    if request.method == 'POST':
+
+        form = SigninForm(request.POST)
+
+        username = request.POST.get('user')
+        password = request.POST.get('password')
+
+        user_exists = Signin.objects.filter(
+            user=username,
+            password=password
+        ).exists()
+
+        if user_exists:
+
+            request.session['user'] = username
+
+            return redirect('file_page')
+
+        else:
+            error = "Invalid username or password"
+
+    else:
+        form = SigninForm()
+
+    return render(
+        request,
+        'something/login.html',
+        {
+            'form': form,
+            'error': error
+        }
+    )
+
+def logout_view(request):
+
+    request.session.flush()
+
+    return redirect('signin')
+
+
+
 
 # http://127.0.0.1:8000/

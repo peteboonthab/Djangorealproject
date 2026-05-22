@@ -32,7 +32,7 @@ class Signin(models.Model):
         validators=[
             RegexValidator(
                 regex=r'^(?=.*@).{10,20}$',
-                message="Enter a valid registration number in the format ABCDEFG123@",
+                message="Enter a valid password: Between 10-20 length with @",
                 code="invalid_registration",
             ),
         ],
